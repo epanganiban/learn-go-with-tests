@@ -1,24 +1,44 @@
 package main
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 func TestWalk(t *testing.T) {
-	expected := "Chris"
-	var got []string
 
-	x := struct {
-		Name string
-	}{expected}
-
-	walk(x, func(input string) {
-		got = append(got, input)
-	})
-
-	if len(got) != 1 {
-		t.Errorf("wrong number of function calls, want %d but got %d", 1, len(got))
+	cases := []struct {
+		Name          string
+		Input         interface{}
+		ExpectedCalls []string
+	}{
+		{
+			"struct with one string field",
+			struct {
+				Name string
+			}{"Chris"},
+			[]string{"Chris"},
+		},
+		{
+			"struct with two string field",
+			struct {
+				Name string
+				City string
+			}{"Chris", "London"},
+			[]string{"Chris", "London"},
+		},
 	}
 
-	if got[0] != expected {
-		t.Errorf("want %q but got %q", expected, got[0])
+	for _, test := range cases {
+		t.Run(test.Name, func(t *testing.T) {
+			var got []string
+			walk(test.Input, func(input string) {
+				got = append(got, input)
+			})
+
+			if !reflect.DeepEqual(got, test.ExpectedCalls) {
+				t.Errorf("want %v but got %v", test.ExpectedCalls, got)
+			}
+		})
 	}
 }
