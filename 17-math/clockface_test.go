@@ -6,24 +6,6 @@ import (
 	"time"
 )
 
-func simpleTime(hours, minutes, seconds int) time.Time {
-	return time.Date(312, time.October, 28, hours, minutes, seconds, 0, time.UTC)
-}
-
-func testName(t time.Time) string {
-	return t.Format("15:04:05")
-}
-
-func roughlyEqualFloat64(a, b float64) bool {
-	const equalityThreshold = 1e-7
-	return math.Abs(a-b) < equalityThreshold
-}
-
-func roughlyEqualPoint(a, b Point) bool {
-	return roughlyEqualFloat64(a.X, b.X) &&
-		roughlyEqualFloat64(a.Y, b.Y)
-}
-
 func TestSecondsInRadians(t *testing.T) {
 	cases := []struct {
 		time  time.Time
@@ -39,13 +21,13 @@ func TestSecondsInRadians(t *testing.T) {
 		t.Run(testName(c.time), func(t *testing.T) {
 			got := secondsInRadians(c.time)
 			if got != c.angle {
-				t.Fatalf("want %v radians but got %v", c.angle, got)
+				t.Fatalf("Wanted %v radians, but got %v", c.angle, got)
 			}
 		})
 	}
 }
 
-func TestSecondHandVector(t *testing.T) {
+func TestSecondHandPoint(t *testing.T) {
 	cases := []struct {
 		time  time.Time
 		point Point
@@ -58,8 +40,26 @@ func TestSecondHandVector(t *testing.T) {
 		t.Run(testName(c.time), func(t *testing.T) {
 			got := secondHandPoint(c.time)
 			if !roughlyEqualPoint(got, c.point) {
-				t.Fatalf("want %v point but got %v", c.point, got)
+				t.Fatalf("Wanted %v Point, but got %v", c.point, got)
 			}
 		})
 	}
+}
+
+func roughlyEqualFloat64(a, b float64) bool {
+	const equalityThreshold = 1e-7
+	return math.Abs(a-b) < equalityThreshold
+}
+
+func roughlyEqualPoint(a, b Point) bool {
+	return roughlyEqualFloat64(a.X, b.X) &&
+		roughlyEqualFloat64(a.Y, b.Y)
+}
+
+func simpleTime(hours, minutes, seconds int) time.Time {
+	return time.Date(312, time.October, 28, hours, minutes, seconds, 0, time.UTC)
+}
+
+func testName(t time.Time) string {
+	return t.Format("15:04:05")
 }
