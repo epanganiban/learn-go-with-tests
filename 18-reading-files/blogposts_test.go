@@ -4,6 +4,7 @@ import (
 	"blogposts"
 	"errors"
 	"io/fs"
+	"reflect"
 	"testing"
 	"testing/fstest"
 )
@@ -18,18 +19,20 @@ func (s StubFailingFS) Open(name string) (fs.File, error) {
 func TestNewBlogPosts(t *testing.T) {
 	t.Run("successful load", func(t *testing.T) {
 		fs := fstest.MapFS{
-			"hello world.md":  {Data: []byte("hi")},
-			"hello-world2.md": {Data: []byte("hola")},
+			"hello world.md":  {Data: []byte("Title: Post 1")},
+			"hello-world2.md": {Data: []byte("Title: Post 2")},
 		}
 
 		posts, err := blogposts.NewPostsFromFS(fs)
-
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		if len(posts) != len(fs) {
-			t.Errorf("wanted %d posts but got %d", len(fs), len(posts))
+		got := posts[0]
+		want := blogposts.Post{Title: "Post 1"}
+
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("want %+v but got %+v", want, got)
 		}
 	})
 
