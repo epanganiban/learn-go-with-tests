@@ -16,6 +16,13 @@ func (s StubFailingFS) Open(name string) (fs.File, error) {
 	return nil, errors.New("oh no, i always fail")
 }
 
+func assertPost(t *testing.T, got, want blogposts.Post) {
+	t.Helper()
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("want %+v but got %+v", want, got)
+	}
+}
+
 func TestNewBlogPosts(t *testing.T) {
 	t.Run("successful load", func(t *testing.T) {
 		fs := fstest.MapFS{
@@ -28,12 +35,7 @@ func TestNewBlogPosts(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		got := posts[0]
-		want := blogposts.Post{Title: "Post 1"}
-
-		if !reflect.DeepEqual(got, want) {
-			t.Errorf("want %+v but got %+v", want, got)
-		}
+		assertPost(t, posts[0], blogposts.Post{Title: "Post 1"})
 	})
 
 	t.Run("load failure", func(t *testing.T) {
